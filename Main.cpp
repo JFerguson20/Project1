@@ -59,6 +59,8 @@ int parseCommand(std::string command){
 	//Add the rest of commands
 	else if(str == "exit"){
 		return -1; 
+	}else{
+		std::cout << "Command not implemented yet or command is invalid" << std::endl;
 	}
 	
 }
