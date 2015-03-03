@@ -5,7 +5,9 @@
 //include all the commands
 #include "Commands.h"
 
+
 #define BUFFER_SIZE 100
+
 
 int main();
 void trim(std::string& str);

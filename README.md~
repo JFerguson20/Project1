@@ -1,8 +1,6 @@
 # Project1
 COCS 560 Programming Assignment 1
 
-
-
 Functions done
 
 mkfs
@@ -12,19 +10,17 @@ read
 seek
 close
 
-TODO:
-
 
 example use
 
 mkfs
 open testfile.txt w
 open testfile2.txt rw
-write 0 "Writing to testfile.txt"
+write 0 "Writing to testfile"
 write 1 "In testfile2"
 close 0
 seek 1 0
 read 1 12
 open testfile.txt r
-read 0 23
+read 0 21
 

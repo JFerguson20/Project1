@@ -1,11 +1,16 @@
+
 #include "Main.h"
+
+std::string prompt = "Feng-Ferguson:~";
+
 
 int main(void) {
 	//loop for the prompt 
+	init();
 	while (1) {
 		std::string command;
-		std::cout << "$ ";
-
+		std::cout << prompt + currDir + "$ ";
+	
 		if (!std::getline(std::cin, command)) {
 			//error
 			return -1;
@@ -50,10 +55,13 @@ int parseCommand(std::string command){
 		read(tokens);
 	}
 	else if(str == "write"){
-		write(tokens);
+		write(tokens, command);
 	}
 	else if(str == "seek"){
 		seek(tokens);
+	}
+	else if(str == "close"){
+		close(tokens);
 	}
 	//TODO
 	//Add the rest of commands

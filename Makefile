@@ -1,5 +1,5 @@
-Project1: Main.o Commands.o
-	g++ -o Project1 Main.o Commands.o
+Project1: Main.o Commands.o Disk.o
+	g++ -o Project1 Main.o Commands.o Disk.o
 
 Main.o: Main.cpp Main.h
 	g++ -c Main.cpp
@@ -7,5 +7,8 @@ Main.o: Main.cpp Main.h
 Commands.o: Commands.cpp Commands.h
 	g++ -c Commands.cpp
 
+Disk.o: Disk.cpp Disk.h
+	g++ -c Disk.cpp
+
 clean:
-	rm Project1 Main.o Commands.o
+	rm Project1 Main.o Commands.o Disk.o
