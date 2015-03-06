@@ -7,8 +7,8 @@
 #define DISK_SIZE 104857600 //100 MBs
 #define DISK_FILE "VirtualDisk.disk"
 #define NUMBER_INODES 1024
-#define INODE_SIZE 10
-#define BLOCK_SIZE 2048
+#define INODE_SIZE 10 //10Byte?
+#define BLOCK_SIZE 2048 //2KB
 #define FILE_LENGTH 16 // maximum file and directory name length
 #define BLOCK_HEADER 24 //FILE LENGTH + BTYE COUNTER + LINK COUNTER
 //int *inode_counter = 0;

@@ -1,12 +1,13 @@
 #include "Commands.h"
 
+/*there is no argument for mkfs shell commands*/
 int mkfs(std::vector<std::string> params){
 	if(params.size() == 1){
 		//creates new file to act as the virtual disk
 		FILE *disk = fopen(DISK_FILE, "w+");
 		//seek to the disk size and write a 0 to make the file 100MBs
 		fseek(disk, DISK_SIZE, SEEK_SET);
-		char end = '0';
+		char end = '0'; //write 0 to disk
 		fwrite(&end, sizeof(char), 1, disk);
 		//close the disk
 		fclose(disk);
@@ -24,7 +25,7 @@ int mkfs(std::vector<std::string> params){
 
 
 int open(std::vector<std::string> params){
-	if(params.size() == 3){
+	if(params.size() == 3){ //3 or 2?
 		std::string filename = params[1];
 		int fd;
 		int flag;
@@ -46,7 +47,7 @@ int open(std::vector<std::string> params){
 			fd = openFile(filename, flag); 
 			//create the file if it doesnt exist
 			if(fd == -1){
-				if (flag == 2 || flag == 3){
+				if (flag == 2 || flag == 3){ // w or rw
 					fd = createInode('f', filename, flag);
 				}
 				else{
@@ -198,3 +199,5 @@ int close(std::vector<std::string> params){
 }
 
 //ADD REST OF COMMANDS HERE
+
+

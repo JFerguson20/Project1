@@ -18,16 +18,16 @@ int init(){
 //INODE ENTRY
 //CHAR - TYPE
 //INT - BLOCK ADDRESS
-//INT - BLOCK ADDRESS #2 FOR BIGGER FILES
+//INT - BLOCK ADDRESS #2 FOR BIGGER FILES  * is there a #3?
 
 /* type is either d for directory or f for file
 *  name is to be passed to createBlock 
 */
-int createInode(char type, std::string name, int flag){
-	FILE *disk = fopen(DISK_FILE, "r+");
+int createInode(char type, std::string name, int flag){ // *creat all inodes 
+	FILE *disk = fopen(DISK_FILE, "r+"); // *for read and write mode
 	int blockPtr1;
 	int blockPtr2;
-	char tempType;
+	char tempType; // for what?
 	int *inode_counter = 0;
 	int fd = -1;
 	//go through each inode until we find a free spot
@@ -91,9 +91,9 @@ int createBlock(std::string name){
 	char tempBlock;
 	
 	//The numbe of bytes in the file after the header
-	int NumberOfBytes = 0;
+	int NumberOfBytes = 0; //when NumberOfBytes changes?
 	//number of links
-	int linkCount = 1;
+	int linkCount = 1; //link stored here or in inode?
 	//skip the inode table
 	for (int i = NUMBER_INODES * INODE_SIZE; i < DISK_SIZE; i += BLOCK_SIZE){
 		fseek(disk, i, SEEK_SET);
@@ -103,12 +103,12 @@ int createBlock(std::string name){
 			//go back 1 before the read
 			fseek(disk, i, SEEK_SET);
 			
-			fwrite(&name[0], sizeof(char), FILE_LENGTH, disk);
+			fwrite(&name[0], sizeof(char), FILE_LENGTH, disk);//*write filename 
 			fseek(disk, i + FILE_LENGTH, SEEK_SET);
 			
 			int link_count = 1;
-			fwrite(&NumberOfBytes, sizeof(int), 1, disk);
-			fwrite(&linkCount, sizeof(int), 1, disk);
+			fwrite(&NumberOfBytes, sizeof(int), 1, disk);//write NumberOfBytes
+			fwrite(&linkCount, sizeof(int), 1, disk); //write linkCount
 			fclose(disk);
 			return i;
 		}
@@ -119,21 +119,21 @@ int createBlock(std::string name){
 }
 
 //second parameter is used if 
-int writeToBlock(int inodeToWrite, char type, int numToWrite, std::string strToWrite){
+int writeToBlock(int inodeToWrite, char type, int numToWrite, std::string strToWrite){//inodeToWrite is the inode index?
 	FILE *disk = fopen(DISK_FILE, "r+");
 	int sizeToWrite = 0;
 	int sizeOfBlock = 0;
 	//the inode index + type + 
-	fseek(disk, inodeToWrite + sizeof(char), SEEK_SET);
+	fseek(disk, inodeToWrite + sizeof(char), SEEK_SET); //char here is for type 
 	int blockIndex;
 	//get the block index
 	fread(&blockIndex, sizeof(int), 1, disk);
 	//go to the block index + name
-	fseek(disk, blockIndex + FILE_LENGTH, SEEK_SET);
+	fseek(disk, blockIndex + FILE_LENGTH, SEEK_SET); //the lenghth of name?  blockIndex * blockSize?
 	//if its a directory
 	//Getthe number of bytes currently in the block
 	fread(&sizeOfBlock, sizeof(int), 1, disk);
-	if(numToWrite > 0){
+	if(numToWrite > 0){ //num to write for what?
 		//type, inode, str length, string
 		sizeToWrite = sizeOfBlock + sizeof(char)+ sizeof(int) +sizeof(int)+ strToWrite.length() + 1;
 	}else{
@@ -157,7 +157,7 @@ int writeToBlock(int inodeToWrite, char type, int numToWrite, std::string strToW
 		fwrite(&strLen, sizeof(int), 1, disk);
 		fwrite(&strToWrite[0], sizeof(char), strLen, disk);
 	}
-	//if its not a directory write the string
+	//if its not a directory write the string, it is a file, then append the file to existing files
 	else{
 		fwrite(&strToWrite[0], sizeof(char), strToWrite.length(), disk);
 	}
@@ -190,12 +190,12 @@ int openFile(std::string fname, int flag){
 	//check the block for the filename (type,inode index, filename)
 	fseek(disk, blockIndex + BLOCK_HEADER, SEEK_SET);
 	int strLen = 0;
-	for(int i = 0; i < blockSize; i+= 10+strLen){
+	for(int i = 0; i < blockSize; i+= 10+strLen){ // 10 = inodesize?
 		fseek(disk, blockIndex + BLOCK_HEADER + i, SEEK_SET);
 		fread(&type, sizeof(char), 1, disk);
 		fread(&inodeIndex, sizeof(int), 1, disk);
 		fread(&strLen, sizeof(int),1,disk);
-		char charFile[FILE_LENGTH];
+		char charFile[FILE_LENGTH];//to store the file name?
 		fread(&charFile[0], sizeof(char), strLen, disk);
 		std::string filename(charFile);	
 		filename.resize(strLen);
@@ -249,7 +249,7 @@ int writeToFile(int fd, std::string str){
 	//if the file is open with a flag of w or rw
 	if (inode >= 0 && flag >= 2){
 		writeToBlock(inode, 'f', 0, str);
-		openFiles[fd][1] += str.length();
+		openFiles[fd][1] += str.length();//openFiles[fd][1] = 0, when openning, now it becomes str.length?
 	}
 	else{
 		std::cout << "File is not open with a 'w' or 'rw' flag" << std::endl;
@@ -298,7 +298,7 @@ std::string readFromBlock(int fd, int inode, int offset, int size, bool readAll)
 		offset = 0;
 	}
 	if (size + offset > sizeOfBlock){
-		std::cout << "There are only " << sizeOfBlock - offset << " bytes left in the file. You can not read more than that" << std::endl;;
+		std::cout << "There are only " << sizeOfBlock - offset << " bytes left in the file. You can not read more than that" << std::endl;
 		size = sizeOfBlock - offset;
 	}
 
@@ -308,12 +308,12 @@ std::string readFromBlock(int fd, int inode, int offset, int size, bool readAll)
 	fread(&charFile[0], sizeof(char), size, disk);
 	std::string output(charFile);
 	output.resize(size);
-	openFiles[fd][1] += size;
+	openFiles[fd][1] += size; //current offset
 	fclose(disk);
 	return output;
 }
 
-int seekFile(int fd, int offset){
+int seekFile(int fd, int offset){ //havn't been used
 
 	int inode = openFiles[fd][0];
 	int oldOffset = openFiles[fd][1];

@@ -6,6 +6,7 @@
 #include "Disk.h"
 #include <stdlib.h>
 #include <sstream>
+#include <fstream>
 int mkfs(std::vector<std::string> params);
 int open(std::vector<std::string> params);
 int read(std::vector<std::string> params);
@@ -14,4 +15,4 @@ int seek(std::vector<std::string> params);
 int close(std::vector<std::string> params);
 int ls(std::vector<std::string> params);
 //add rest of commands
-
+int sh(std::vector<std::string> params);
