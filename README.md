@@ -28,3 +28,12 @@ read 1 12
 open testfile.txt r
 read 0 23
 
+
+//how to use sh command
+sh test_input.txt test_output.txt
+read commands from test_input.txt and direct output to test_output.txt
+
+
+
+
+
