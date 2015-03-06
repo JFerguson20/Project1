@@ -1,0 +1,10 @@
+mkfs
+open testfile.txt w
+open testfile2.txt rw
+write 0 "Writing to testfile.txt"
+write 1 "In testfile2"
+close 0
+seek 1 0
+read 1 12
+open testfile.txt r
+read 0 23
