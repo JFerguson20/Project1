@@ -48,7 +48,7 @@ int open(std::vector<std::string> params){
 			//create the file if it doesnt exist
 			if(fd == -1){
 				if (flag == 2 || flag == 3){ // w or rw
-					fd = createInode('f', filename, flag);
+					fd = createInode('f', filename, 0, flag);
 				}
 				else{
 					std::cout << "File does not exist, open with 'w' to create file" << std::endl;
@@ -220,7 +220,19 @@ int mkdir(std::vector<std::string> params){
 
 int rmdir(std::vector<std::string> params){
 	if(params.size() == 2){
-
+		std::string dirname = params[1];
+		if (dirname.length() < FILE_LENGTH){
+			
+			if (changeDir(dirname) >= 0){
+				removeDir(dirname);
+			}
+			else{
+				std::cout << "Directory does not exist" << std::endl;
+			}
+		}
+		else{
+			std::cout << "directory name must be 16 or less characters" << std::endl;
+		}
 		
 		return 1;
 	}else{
@@ -237,6 +249,8 @@ int cd(std::vector<std::string> params){
 		if (dirname.length() < FILE_LENGTH){
 			int newDir = changeDir(dirname);
 			if (changeDir(dirname) >= 0){
+
+
 				setCurrDir(newDir, dirname);
 			}
 			else{
@@ -265,3 +279,65 @@ int ls(std::vector<std::string> params){
 	}
 }
 
+int link(std::vector<std::string> params){
+	if (params.size() == 3){
+		std::string src = params[1];
+		std::string dest = params[2];
+		//check if file name is less than 16 characters
+		
+		linkFiles(src, dest);
+
+		return 1;
+	}
+	else{
+		std::cout << "link has two parameters <src> <dest>" << std::endl;
+		return -1;
+	}
+}
+
+int unlink(std::vector<std::string> params){
+	if (params.size() == 2){
+		std::string dest = params[1];
+		//check if file name is less than 16 characters
+
+		unlinkFiles(dest);
+
+		return 1;
+	}
+	else{
+		std::cout << "unlink has 1 parameter <dest>" << std::endl;
+		return -1;
+	}
+}
+
+int stat(std::vector<std::string> params){
+	if (params.size() == 2){
+		std::string filename = params[1];
+		//check if file name is less than 16 characters
+
+		stats(filename);
+
+		return 1;
+	}
+	else{
+		std::cout << "stat has 1 parameter <filename>" << std::endl;
+		return -1;
+	}
+}
+
+int cat(std::vector<std::string> params){
+	if (params.size() == 2){
+		std::string filename = params[1];
+		//check if file name is less than 16 characters
+
+		catFile(filename);
+
+
+
+		return 1;
+	}
+	else{
+		std::cout << "cat has 1 parameter <filename>" << std::endl;
+		return -1;
+	}
+}

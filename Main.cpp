@@ -75,6 +75,18 @@ int parseCommand(std::string command){
 	else if(str == "ls"){
 		ls(tokens);
 	}
+	else if (str == "link"){
+		link(tokens);
+	}
+	else if (str == "unlink"){
+		unlink(tokens);
+	}
+	else if (str == "cat"){
+		cat(tokens);
+	}
+	else if (str == "stat"){
+		stat(tokens);
+	}
         //Add from here
         else if (str == "sh"){
                 sh(tokens);

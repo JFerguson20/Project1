@@ -8,9 +8,9 @@
 #define DISK_FILE "VirtualDisk.disk"
 #define NUMBER_INODES 1024
 #define INODE_SIZE 14 //1 TYPE (char) + link count(int) + block1(int) + block2+(int)
-#define BLOCK_SIZE 2048 //2KB
+#define BLOCK_SIZE 4096 //4KB
 #define FILE_LENGTH 16 // maximum file and directory name length
-#define BLOCK_HEADER 20 //FILE LENGTH + BTYE COUNTER
+#define BLOCK_HEADER 24 //FILE LENGTH + BTYE COUNTER + parent dir inode
 //int *inode_counter = 0;
 
 extern std::string currDir;
@@ -18,7 +18,7 @@ extern int currDirInode;
 extern int openFiles [1024][3];// an array of the inodes of files that are open with the offsets and flag
 
 int init();
-int createInode(char type, std::string name, int flag = 0);
+int createInode(char type, std::string name, int src = 0, int flag = 0);
 int createBlock(std::string name);
 int writeToBlock(int inodeToWrite, char type, int numToWrite, std::string strToWrite, int offset = 0);
 int setCurrDir(int inode, std::string dir);
@@ -33,9 +33,15 @@ int createDir(std::string dirname);
 int removeDir(std::string dirname);
 int changeDir(std::string dirname);
 int ls();
+int linkFiles(std::string src, std::string dest);
+int unlinkFiles(std::string dest);
+int stats(std::string filename);
+int catFile(std::string filename);
 std::string readFromBlock(int fd, int inodeToWrite, int offset, int size, bool readAll = false);
 
 //helper methods
-void eraseFileFromDir(int index);
+void incrementLink(int inode);
+void decrementLink(int inode);
+int eraseFileFromDir(int blockIndex, int deleteIndex);
 void eraseInode(int inode);
 bool isEmpty(int inode);

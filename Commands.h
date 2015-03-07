@@ -17,6 +17,12 @@ int close(std::vector<std::string> params);
 int mkdir(std::vector<std::string> params);
 int rmdir(std::vector<std::string> params);
 int cd(std::vector<std::string> params);
+int link(std::vector<std::string> params);
+int unlink(std::vector<std::string> params);
+int stat(std::vector<std::string> params);
 int ls(std::vector<std::string> params);
+int cat(std::vector<std::string> params);
+
+
 //add rest of commands
 
