@@ -13,6 +13,10 @@ int read(std::vector<std::string> params);
 int write(std::vector<std::string> params, std::string str);
 int seek(std::vector<std::string> params);
 int close(std::vector<std::string> params);
+//in progress
+int mkdir(std::vector<std::string> params);
+int rmdir(std::vector<std::string> params);
+int cd(std::vector<std::string> params);
 int ls(std::vector<std::string> params);
 //add rest of commands
-int sh(std::vector<std::string> params);
+

@@ -198,6 +198,70 @@ int close(std::vector<std::string> params){
 	return 1;
 }
 
-//ADD REST OF COMMANDS HERE
+int mkdir(std::vector<std::string> params){
+	if(params.size() == 2){
+		std::string dirname = params[1];
+		
+		//check if file name is less than 16 characters
+		if(dirname.length() < FILE_LENGTH){
+			if(createDir(dirname) < 0){
+				std::cout << "File name already exists" <<std::endl;
+			}
+		}else{
+			std::cout << "directory name must be 16 or less characters" <<std::endl;
+		}
+		
+		return 1;
+	}else{
+		std::cout << "mkdir has one parameter <dirname>" << std::endl;
+		return -1;
+	}
+}
 
+int rmdir(std::vector<std::string> params){
+	if(params.size() == 2){
+
+		
+		return 1;
+	}else{
+		std::cout << "rmdir has one parameter <dirname>" << std::endl;
+		return -1;
+	}
+}
+
+int cd(std::vector<std::string> params){
+	if(params.size() == 2){
+		std::string dirname = params[1];
+
+		//check if file name is less than 16 characters
+		if (dirname.length() < FILE_LENGTH){
+			int newDir = changeDir(dirname);
+			if (changeDir(dirname) >= 0){
+				setCurrDir(newDir, dirname);
+			}
+			else{
+				std::cout << "Directory does not exist" << std::endl;
+			}
+		}
+		else{
+			std::cout << "directory name must be 16 or less characters" << std::endl;
+		}
+
+		return 1;
+	}else{
+		std::cout << "cd has one parameter <dirname>" << std::endl;
+		return -1;
+	}
+}
+
+int ls(std::vector<std::string> params){
+	if(params.size() == 1){
+
+		ls();
+		return 1;
+	}else{
+		std::cout << "ls has no parameters" << std::endl;
+		return -1;
+	}
+}
 

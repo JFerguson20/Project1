@@ -12,4 +12,4 @@
 int main();
 void trim(std::string& str);
 int parseCommand(std::string command);
-
+int sh(std::vector<std::string> params);

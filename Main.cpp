@@ -63,7 +63,18 @@ int parseCommand(std::string command){
 	else if(str == "close"){
 		close(tokens);
 	}
-
+	else if(str == "mkdir"){
+		mkdir(tokens);
+	}
+	else if(str == "rmdir"){
+		rmdir(tokens);
+	}
+	else if(str == "cd"){
+		cd(tokens);
+	}
+	else if(str == "ls"){
+		ls(tokens);
+	}
         //Add from here
         else if (str == "sh"){
                 sh(tokens);
