@@ -2,9 +2,8 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
-//include all the commands
-#include "Commands.h"
-
+#include "Remote.h"
+//#include "Sh.h"
 
 #define BUFFER_SIZE 100
 
@@ -12,4 +11,5 @@
 int main();
 void trim(std::string& str);
 int parseCommand(std::string command);
-int sh(std::vector<std::string> params);
+
+
