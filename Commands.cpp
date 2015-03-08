@@ -200,15 +200,17 @@ int close(std::vector<std::string> params){
 
 int mkdir(std::vector<std::string> params){
 	if(params.size() == 2){
-		std::string dirname = params[1];
 		
+		int inode = findDirInode(params[1]);
 		//check if file name is less than 16 characters
+		std::vector<std::string> v = split(params[1], "/");
+		std::string dirname = v[v.size() - 1];
 		if(dirname.length() < FILE_LENGTH){
-			if(createDir(dirname) < 0){
+			if(createDir(inode, dirname) < 0){
 				std::cout << "File name already exists" <<std::endl;
 			}
 		}else{
-			std::cout << "directory name must be 16 or less characters" <<std::endl;
+			std::cout << "File name is to large, max of 16 characters" << std::endl;
 		}
 		
 		return 1;
@@ -220,10 +222,14 @@ int mkdir(std::vector<std::string> params){
 
 int rmdir(std::vector<std::string> params){
 	if(params.size() == 2){
-		std::string dirname = params[1];
-		if (dirname.length() < FILE_LENGTH){
-			
-			if (changeDir(dirname) >= 0){
+
+
+		int inode = findDirInode(params[1]);
+		//check if file name is less than 16 characters
+		std::vector<std::string> v = split(params[1], "/");
+		std::string dirname = v[v.size() - 1];
+		if(dirname.length() < FILE_LENGTH){
+			if (changeDir(inode, dirname) >= 0){
 				removeDir(dirname);
 			}
 			else{
@@ -231,9 +237,8 @@ int rmdir(std::vector<std::string> params){
 			}
 		}
 		else{
-			std::cout << "directory name must be 16 or less characters" << std::endl;
+			std::cout << "File name is to large, max of 16 characters" << std::endl;
 		}
-		
 		return 1;
 	}else{
 		std::cout << "rmdir has one parameter <dirname>" << std::endl;
@@ -243,22 +248,21 @@ int rmdir(std::vector<std::string> params){
 
 int cd(std::vector<std::string> params){
 	if(params.size() == 2){
-		std::string dirname = params[1];
 
+		int inode = findDirInode(params[1]);
 		//check if file name is less than 16 characters
-		if (dirname.length() < FILE_LENGTH){
-			int newDir = changeDir(dirname);
-			if (changeDir(dirname) >= 0){
-
-
+		std::vector<std::string> v = split(params[1], "/");
+		std::string dirname = v[v.size() - 1];
+		if(dirname.length() < FILE_LENGTH){
+			int newDir = changeDir(inode, dirname);
+			if (newDir >= 0){
 				setCurrDir(newDir, dirname);
-			}
-			else{
-				std::cout << "Directory does not exist" << std::endl;
+			}else{
+				std::cout << "File name already exists" << std::endl;
 			}
 		}
 		else{
-			std::cout << "directory name must be 16 or less characters" << std::endl;
+			std::cout << "File name is to large, max of 16 characters" << std::endl;
 		}
 
 		return 1;
@@ -281,12 +285,24 @@ int ls(std::vector<std::string> params){
 
 int link(std::vector<std::string> params){
 	if (params.size() == 3){
-		std::string src = params[1];
-		std::string dest = params[2];
-		//check if file name is less than 16 characters
-		
-		linkFiles(src, dest);
 
+		//
+		int srcInode = findDirInode(params[1]);
+		int destInode = findDirInode(params[2]);
+		//check if file name is less than 16 characters
+		std::vector<std::string> vs = split(params[1], "/");
+		std::string src = vs[vs.size() - 1];
+
+		std::vector<std::string> vd = split(params[2], "/");
+		std::string dest = vd[vd.size() - 1];
+
+		if(src.length() < FILE_LENGTH || dest.length() < FILE_LENGTH){
+			//check if file name is less than 16 characters
+			
+			linkFiles(srcInode, destInode, src, dest);
+		}else{
+			std::cout << "File name is to large, max of 16 characters" << std::endl;
+		}
 		return 1;
 	}
 	else{
@@ -297,10 +313,12 @@ int link(std::vector<std::string> params){
 
 int unlink(std::vector<std::string> params){
 	if (params.size() == 2){
-		std::string dest = params[1];
-		//check if file name is less than 16 characters
 
-		unlinkFiles(dest);
+		//check if file name is less than 16 characters
+		int destInode = findDirInode(params[1]);
+		std::vector<std::string> vd = split(params[1], "/");
+		std::string dest = vd[vd.size() - 1];
+		unlinkFiles(destInode, dest);
 
 		return 1;
 	}
@@ -375,4 +393,21 @@ int expo(std::vector<std::string> params){
 		std::cout << "export has two parameters <src> <dest>" << std::endl;
 		return -1;
 	}
+}
+
+int cp(std::vector<std::string> params){
+	if (params.size() == 3){
+
+		int srcInode = findDirInode(params[1]);
+		int destInode = findDirInode(params[2]);
+		//check if file name is less than 16 characters
+		std::vector<std::string> vs = split(params[1], "/");
+		std::string src = vs[vs.size() - 1];
+
+		std::vector<std::string> vd = split(params[2], "/");
+		std::string dest = vd[vd.size() - 1];
+;
+		copy(srcInode, destInode, src, dest);
+	}
+	return 1;
 }

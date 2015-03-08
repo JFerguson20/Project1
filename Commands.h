@@ -25,5 +25,6 @@ int cat(std::vector<std::string> params);
 int tree(std::vector<std::string> params);
 int import(std::vector<std::string> params);
 int expo(std::vector<std::string> params);
+int cp(std::vector<std::string> params);
 //add rest of commands
 

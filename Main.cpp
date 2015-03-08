@@ -96,14 +96,16 @@ int parseCommand(std::string command){
 	else if (str == "export"){
 		expo(tokens);
 	}
+	else if (str == "cp"){
+		cp(tokens);
+	}
         //Add from here
         else if (str == "sh"){
                 sh(tokens);
         }
 
         //Add end here
-	//TODO
-	//Add the rest of commands
+
 	else if(str == "exit"){
 		return -1; 
 	}else{
@@ -130,7 +132,6 @@ int parseCommandForSh(std::string command){
 	//get the first word from tokens
 	std::string str = tokens[0];
 	//see if the string matches our commands
-
 	if(str == "mkfs"){
 		mkfs(tokens);
 	}
@@ -149,11 +150,54 @@ int parseCommandForSh(std::string command){
 	else if(str == "close"){
 		close(tokens);
 	}
-        else 
-        {
-		std::cout << "Command not implemented yet or command is invalid" << std::endl;
-                return -2;
+	else if(str == "mkdir"){
+		mkdir(tokens);
+	}
+	else if(str == "rmdir"){
+		rmdir(tokens);
+	}
+	else if(str == "cd"){
+		cd(tokens);
+	}
+	else if(str == "ls"){
+		ls(tokens);
+	}
+	else if (str == "link"){
+		link(tokens);
+	}
+	else if (str == "unlink"){
+		unlink(tokens);
+	}
+	else if (str == "cat"){
+		cat(tokens);
+	}
+	else if (str == "stat"){
+		stat(tokens);
+	}
+	else if (str == "tree"){
+		tree(tokens);
+	}
+	else if (str == "import"){
+		import(tokens);
+	}
+	else if (str == "export"){
+		expo(tokens);
+	}
+	else if (str == "cp"){
+		cp(tokens);
+	}
+        //Add from here
+        else if (str == "sh"){
+                sh(tokens);
         }
+
+        //Add end here
+
+	else if(str == "exit"){
+		return -1; 
+	}else{
+		std::cout << "Command not implemented yet or command is invalid" << std::endl;
+	}
 }
 
 

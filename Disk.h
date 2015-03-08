@@ -5,11 +5,14 @@
 #include <stdio.h>
 #include <iostream>
 #include <string>
+#include <vector>
+#include <algorithm>
+#include <iterator>
 #define DISK_SIZE 104857600 //100 MBs
 #define DISK_FILE "VirtualDisk.disk"
-#define NUMBER_INODES 1024
+#define NUMBER_INODES 2028
 #define INODE_SIZE 14 //1 TYPE (char) + link count(int) + block1(int) + block2+(int)
-#define BLOCK_SIZE 4096 //4KB
+#define BLOCK_SIZE 32768 //32KB
 #define FILE_LENGTH 16 // maximum file and directory name length
 #define BLOCK_HEADER 24 //FILE LENGTH + BTYE COUNTER + parent dir inode
 //int *inode_counter = 0;
@@ -30,17 +33,18 @@ int writeToFile(int fd, std::string str);
 int readFromFile(int fd, int size);
 int seekFile(int fd, int offset);
 int closeFile(int fd);
-int createDir(std::string dirname);
+int createDir(int inode, std::string dirname);
 int removeDir(std::string dirname);
-int changeDir(std::string dirname);
+int changeDir(int inode, std::string dirname);
 int ls();
-int linkFiles(std::string src, std::string dest);
-int unlinkFiles(std::string dest);
+int linkFiles(int srcInode, int destInode, std::string src, std::string dest);
+int unlinkFiles(int inode, std::string dest);
 int stats(std::string filename);
 int catFile(std::string filename);
 int printTree(int dirInode, int depth);
 int importFile(std::string src, std::string dest);
 int exportFile(std::string src, std::string dest);
+int copy(int srcInode, int destInode, std::string src, std::string dest);
 //helper methods
 std::string readFromBlock(int fd, int inodeToWrite, int offset, int size, bool readAll = false);
 int createSecondBlock();
@@ -50,3 +54,6 @@ void decrementLink(int inode);
 int eraseFileFromDir(int blockIndex, int deleteIndex);
 void eraseInode(int inode);
 bool isEmpty(int inode);
+int findDirInode(std::string input);
+int findDir(int inode, std::string dirname);
+std::vector<std::string> split(const std::string& s, const std::string& delim, const bool keep_empty = true);
