@@ -1,6 +1,7 @@
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #endif
+#include <fstream>
 #include <stdio.h>
 #include <iostream>
 #include <string>
@@ -37,9 +38,13 @@ int linkFiles(std::string src, std::string dest);
 int unlinkFiles(std::string dest);
 int stats(std::string filename);
 int catFile(std::string filename);
-std::string readFromBlock(int fd, int inodeToWrite, int offset, int size, bool readAll = false);
-
+int printTree(int dirInode, int depth);
+int importFile(std::string src, std::string dest);
+int exportFile(std::string src, std::string dest);
 //helper methods
+std::string readFromBlock(int fd, int inodeToWrite, int offset, int size, bool readAll = false);
+int createSecondBlock();
+int numOfBlocks(int inodeIndex);
 void incrementLink(int inode);
 void decrementLink(int inode);
 int eraseFileFromDir(int blockIndex, int deleteIndex);

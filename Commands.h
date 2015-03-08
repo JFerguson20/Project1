@@ -22,7 +22,8 @@ int unlink(std::vector<std::string> params);
 int stat(std::vector<std::string> params);
 int ls(std::vector<std::string> params);
 int cat(std::vector<std::string> params);
-
-
+int tree(std::vector<std::string> params);
+int import(std::vector<std::string> params);
+int expo(std::vector<std::string> params);
 //add rest of commands
 

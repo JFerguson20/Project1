@@ -7,6 +7,7 @@ int currDirInode = -1;
 int openFiles [1024][3];
 
 int init(){
+	setCurrDir(0, "/");
 	for(int i =0; i < 1024; i++){
 		openFiles[i][0] = -1;
 		openFiles[i][1] = 0; //the current offset
@@ -134,7 +135,7 @@ int createBlock(std::string name){
 			return i;
 		}
 	}
-	
+	fclose(disk);
 	std::cout << "No new blocks, this means the disk is full" << std::endl;
 	return -1;
 }
@@ -666,25 +667,84 @@ int unlinkFiles(std::string dest){
 	return 1;
 }
 
-int stats(std::string filename){
+int stats(std::string fname){
+	FILE *disk = fopen(DISK_FILE, "r+");
+	//search through the current directory for the filename
+	int blockIndex;
+	int blockSize;
+	int linkCount;
+	char type;
+	int inodeIndex;
+
+	//go to the current directory in the inode table + type 
+	fseek(disk, currDirInode + sizeof(char), SEEK_SET);
+	fread(&linkCount, sizeof(int), 1, disk);
+	fread(&blockIndex, sizeof(int), 1, disk);
+	//go the the curr directory block
+	fseek(disk, blockIndex + FILE_LENGTH, SEEK_SET);
+	fread(&blockSize, sizeof(int), 1, disk);
+	//check the block for the filename (type,inode index, filename)
+	fseek(disk, blockIndex + BLOCK_HEADER, SEEK_SET);
+	int strLen = 0;
+	for (int i = 0; i < blockSize; i += 10 + strLen){ // 10 = inodesize?
+		fseek(disk, blockIndex + BLOCK_HEADER + i, SEEK_SET);
+		fread(&type, sizeof(char), 1, disk);
+		fread(&inodeIndex, sizeof(int), 1, disk);
+		fread(&strLen, sizeof(int), 1, disk);
+		char charFile[FILE_LENGTH];//to store the file name?
+		fread(&charFile[0], sizeof(char), strLen, disk);
+		std::string filename(charFile);
+		filename.resize(strLen);
+
+		if (filename == fname){
+			
+			
+			std::cout << "NAME: " << fname << std::endl;
+			if (type == 'd'){
+				std::cout << "TYPE: Directory" <<  std::endl;
+			}
+			else if(type == 'f'){
+				std::cout << "TYPE: File" << std::endl;
+			}
+			else{
+				std::cout << "TYPE: Link" << std::endl;
+			}
+			std::cout << "INODE: " << inodeIndex << std::endl;
+			std::cout << "LINK COUNT: " << linkCount << std::endl;
+
+			// go to the file inode
+			fseek(disk, inodeIndex + sizeof(char) + sizeof(int), SEEK_SET);
+			fread(&blockIndex, sizeof(int), 1, disk);
+			std::cout << "BLOCK INDEX: " << blockIndex << std::endl;
+			fseek(disk, blockIndex + FILE_LENGTH, SEEK_SET);
+			fread(&blockSize, sizeof(int), 1, disk);
+			std::cout << "SIZE: " << blockSize << " bytes" << std::endl;
+
+			//std::cout << "NUM BLOCKS: " << numOfBlocks(inodeIndex) << std::endl;
+			fclose(disk);
+			return 1;
+		}
+	}
+	std::cout << "File does not exist" << std::endl;
+
+	fclose(disk);
+
 
 	return 1;
 }
 
 int catFile(std::string fname){
 
-
-
 	FILE *disk = fopen(DISK_FILE, "r+");
 	//search through the current directory for the filename
 	int blockIndex;
 	int blockSize;
-	int fd = -1;
 	char type;
 	int inodeIndex;
 
 	//go to the current directory in the inode table + type + link count
-	fseek(disk, currDirInode + sizeof(char) + sizeof(int), SEEK_SET);
+	fseek(disk, currDirInode + sizeof(char) +sizeof(int), SEEK_SET);
+	
 	fread(&blockIndex, sizeof(int), 1, disk);
 	//go the the curr directory block
 	fseek(disk, blockIndex + FILE_LENGTH, SEEK_SET);
@@ -714,13 +774,174 @@ int catFile(std::string fname){
 
 	fclose(disk);
 
+	return 1;
+}
+
+int printTree(int dirInode, int depth){
+
+	//much code taken from createdir
+	FILE *disk = fopen(DISK_FILE, "r+");
+	//search through the current directory for the filename
+	int blockIndex;
+	int blockSize;
+	char type;
+	int inodeIndex;
+
+	//go to the current directory in the inode table + type + link count
+	fseek(disk, dirInode + sizeof(char) + sizeof(int), SEEK_SET);
+	fread(&blockIndex, sizeof(int), 1, disk);
+
+
+	//go the the curr directory block
+	fseek(disk, blockIndex + FILE_LENGTH, SEEK_SET);
+	fread(&blockSize, sizeof(int), 1, disk);
+	//check the block for the filename (type,inode index, filename)
+	fseek(disk, blockIndex + BLOCK_HEADER, SEEK_SET);
+	int strLen = 0;
+
+	char blockArray[BLOCK_SIZE];
+	fseek(disk, blockIndex, SEEK_SET);
+	fread(blockArray, sizeof(char), BLOCK_SIZE, disk);
+
+	for (int i = 0; i < blockSize; i += 10 + strLen){ // 10 = inodesize?
+		fseek(disk, blockIndex + BLOCK_HEADER + i, SEEK_SET);
+		fread(&type, sizeof(char), 1, disk);
+		fread(&inodeIndex, sizeof(int), 1, disk);
+		fread(&strLen, sizeof(int), 1, disk);
+		char charFile[FILE_LENGTH];//to store the file name?
+		fread(&charFile[0], sizeof(char), strLen, disk);
+		std::string filename(charFile);
+		filename.resize(strLen);
+
+		if (type == 'd'){
+			for (int d = 0; d < depth; d++){
+				std::cout << "-";
+			}
+			std::cout << filename << std::endl;
+			printTree(inodeIndex, depth + 1);
+		}
+		else{
+			for (int d = 0; d < depth; d++){
+				std::cout << "-";
+			}
+			// go to the file inode
+			int tempBlockIndex;
+			fseek(disk, inodeIndex + sizeof(char) + sizeof(int), SEEK_SET);
+			fread(&tempBlockIndex, sizeof(int), 1, disk);
+			fseek(disk, tempBlockIndex + FILE_LENGTH, SEEK_SET);
+			fread(&blockSize, sizeof(int), 1, disk);
+			std::cout << filename << " " << blockSize << std::endl;
+		}
+	}
 	
-	
-	
+	fclose(disk);
+	//return the fd or -1 if didnt find file
 
 	return 1;
 }
 
+int importFile(std::string src, std::string dest){
+
+	int flag = 2; //for write
+	int fd = createInode('f', dest, 0, flag);
+	int inode = openFiles[fd][0];
+	//read file line by line are write the file
+	std::ifstream file(src.c_str());
+	std::string str;
+	std::string file_contents;
+	int offset = 0;
+	//write line by line
+	while (std::getline(file, str))
+	{	
+		str.push_back('\n');
+		writeToBlock(inode, 'f', 0, str, offset);
+		offset += str.length();
+	}
+	closeFile(fd);
+	file.close();
+	return 1;
+}
+
+
+//TAKEN FROM CAT BUT INSTEAD OF PRINTING TO CONSOLE PRINT TO FILE
+int exportFile(std::string src, std::string dest){
+
+	FILE *disk = fopen(DISK_FILE, "r+");
+	//search through the current directory for the filename
+	int blockIndex;
+	int blockSize;
+	char type;
+	int inodeIndex;
+
+	//go to the current directory in the inode table + type + link count
+	fseek(disk, currDirInode + sizeof(char) + sizeof(int), SEEK_SET);
+
+	fread(&blockIndex, sizeof(int), 1, disk);
+	//go the the curr directory block
+	fseek(disk, blockIndex + FILE_LENGTH, SEEK_SET);
+	fread(&blockSize, sizeof(int), 1, disk);
+	//check the block for the filename (type,inode index, filename)
+	fseek(disk, blockIndex + BLOCK_HEADER, SEEK_SET);
+	int strLen = 0;
+	for (int i = 0; i < blockSize; i += 10 + strLen){ // 10 = inodesize?
+		fseek(disk, blockIndex + BLOCK_HEADER + i, SEEK_SET);
+		fread(&type, sizeof(char), 1, disk);
+		fread(&inodeIndex, sizeof(int), 1, disk);
+		fread(&strLen, sizeof(int), 1, disk);
+		char charFile[FILE_LENGTH];//to store the file name?
+		fread(&charFile[0], sizeof(char), strLen, disk);
+		std::string filename(charFile);
+		filename.resize(strLen);
+
+		if (filename == src && (type == 'f' || type == 'l')){
+			fclose(disk);
+			std::string output = readFromBlock(0, inodeIndex, 0, 0, true);
+			std::ofstream out(dest.c_str());
+			out << output;
+			out.close();
+			std::cout << "File exported" << std::endl;
+
+			return 1;
+		}
+	}
+	std::cout << "Src does not exist" << std::endl;
+
+	fclose(disk);
+
+	return 1;
+}
+
+
+int createSecondBlock(){
+	FILE *disk = fopen(DISK_FILE, "r+");
+	char tempBlock;
+
+	int NumberOfBlocks = 0; 
+
+	//NUM OF BLOCKS
+	//INT BLOCKPTR
+	for (int i = NUMBER_INODES * INODE_SIZE; i < DISK_SIZE; i += BLOCK_SIZE){
+		fseek(disk, i, SEEK_SET);
+		fread(&tempBlock, sizeof(char), 1, disk);
+		//if a block doesnt already exist here
+		if (!tempBlock){
+			//go back 1 before the read
+			fseek(disk, i, SEEK_SET);
+			fwrite(&NumberOfBlocks, sizeof(int), 1, disk);//write NumberOfBytes
+			
+			fclose(disk);
+			return i;
+		}
+	}
+	fclose(disk);
+	std::cout << "No new blocks, this means the disk is full" << std::endl;
+	return -1;
+}
+
+int numOfBlocks(int inodeIndex){
+	int ret = 1;
+	return ret;
+}
 
 void incrementLink(int inode){
 	FILE *disk = fopen(DISK_FILE, "r+");

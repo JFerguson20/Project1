@@ -341,3 +341,38 @@ int cat(std::vector<std::string> params){
 		return -1;
 	}
 }
+
+int tree(std::vector<std::string> params){
+	if (params.size() == 1){
+		printTree(currDirInode, 0);
+	}
+	else{
+		std::cout << "tree has no parameters" << std::endl;
+		return -1;
+	}
+}
+
+int import(std::vector<std::string> params){
+	if (params.size() == 3){
+		std::string src = params[1];
+		std::string dest = params[2];
+		importFile(src, dest);
+	}
+	else{
+		std::cout << "import has two parameters <src> <dest>" << std::endl;
+		return -1;
+	}
+}
+
+
+int expo(std::vector<std::string> params){
+	if (params.size() == 3){
+		std::string src = params[1];
+		std::string dest = params[2];
+		exportFile(src, dest);
+	}
+	else{
+		std::cout << "export has two parameters <src> <dest>" << std::endl;
+		return -1;
+	}
+}

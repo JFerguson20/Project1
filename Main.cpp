@@ -87,6 +87,15 @@ int parseCommand(std::string command){
 	else if (str == "stat"){
 		stat(tokens);
 	}
+	else if (str == "tree"){
+		tree(tokens);
+	}
+	else if (str == "import"){
+		import(tokens);
+	}
+	else if (str == "export"){
+		expo(tokens);
+	}
         //Add from here
         else if (str == "sh"){
                 sh(tokens);
